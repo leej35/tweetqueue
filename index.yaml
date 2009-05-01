@@ -10,7 +10,20 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Used 5 times in query history.
+# Used 24 times in query history.
+- kind: Tweet
+  properties:
+  - name: posted
+  - name: date
+
+# Used 4 times in query history.
+- kind: Tweet
+  properties:
+  - name: posted
+  - name: profile
+  - name: date
+
+# Used 12 times in query history.
 - kind: Tweet
   properties:
   - name: profile
