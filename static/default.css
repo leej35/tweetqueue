@@ -1,0 +1,106 @@
+*
+{
+	margin: 0;
+	padding: 0;
+	font-family: Helvetica, Verdana, sans-serif;
+}
+
+ul.guests
+{
+	list-style: none;
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+}
+	ul.guests li
+	{
+		padding-bottom: 0.5em;
+		margin-bottom: 0.5em;
+		border-bottom: solid 1px #888888;
+	}
+		ul.guests li div.children, .guest div.children
+		{
+			margin-left: 1.0em;
+		}
+	ul.guests li.jump
+	{
+		border-bottom: none;
+	}
+
+.guest { margin: 0.5em; }
+p.goodbye { margin: 0.5em; }
+
+div.address { margin-bottom: 1em; }
+
+.rsvp em
+{
+	font-weight: bold;
+}
+
+h1, h2 {
+	text-align: center;
+	border-top: solid 1px black;
+	border-bottom: solid 1px black;
+}
+h1 {
+	background-image: url(h1.png);
+	background-repeat: repeat-x;
+	background-position: top-left;
+	background-color: #5577ff;
+	text-shadow: 1px 1px 2px #000088;
+}
+h2 {
+	background-image: url(h2.png);
+	background-repeat: repeat-x;
+	background-position: top-left;
+	background-color: #aaccff;
+	text-shadow: 1px 1px 2px #5577ff;
+}
+h2 { margin-bottom: 0.5em; }
+
+div.links
+{
+	margin: 0.5em;
+	margin-bottom: 1em;
+}
+	div.links ul
+	{
+		list-style: none;
+	}
+		div.links ul ul
+		{
+			margin-left: 1.5em;
+		}
+
+.guest div.buttons
+{
+	padding-top: 0.5em;
+	margin-top: 0.5em;
+	border-top: solid 1px #888888;
+}
+
+td
+{
+	vertical-align: top;
+	padding: 0.2em;
+}
+
+input, textarea
+{
+	padding: 0.2em;
+	margin: 0.2em;
+}
+input[type="submit"]
+{
+	width: 75px;
+}
+
+.name
+{
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+a {
+	text-decoration: none;
+	color: #5577ff;
+}

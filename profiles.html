@@ -1,0 +1,40 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Tweet Queue</title>
+		<link rel="stylesheet" href="/static/default.css" type="text/css" />
+		<!--[if !IE]>-->
+		<link media="only screen and (max-device-width: 480px)" rel="stylesheet" type="text/css" href="/static/iphone.css"/>
+		<!--<![endif]-->
+		<meta name="viewport" content="width=320" />
+		
+	</head>
+	<body>
+		<p style="height: 0px; margin: 0px;"><a name="top"></a></p>
+		<h1>Profiles</h1>
+		<ul>
+			{% for profile in profiles %}
+			<li><a href="/tweets/{{ profile.name }}">{{ profile.name }}</a></li>
+			{% endfor %}
+			<li>
+				<div>
+					<form method="POST" action="/profiles">
+						<table>
+							<tr>
+								<td><label for="name">Name</label></td>
+								<td><input type="text" name="name" id="name"></input></td>
+							</tr>
+							<tr>
+								<td><label for="password">Password</label></td>
+								<td><input type="text" name="password" id="password"></input></td>
+							</tr>
+							<tr>
+								<td>&nbsp;</td>
+								<td><input type="submit" name="Add" value="Add"></input></td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</li>
+		</ul>
+	</body>
+</html>
