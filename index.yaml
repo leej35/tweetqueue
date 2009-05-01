@@ -23,20 +23,12 @@ indexes:
   - name: posted
   - name: date
 
-# Used 43 times in query history.
+# Used 75 times in query history.
 - kind: Tweet
   properties:
   - name: posted
   - name: profile
   - name: date
-
-# Used 20 times in query history.
-- kind: Tweet
-  properties:
-  - name: posted
-  - name: profile
-  - name: date
-    direction: desc
 
 # Used 12 times in query history.
 - kind: Tweet

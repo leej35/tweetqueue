@@ -99,7 +99,7 @@ class TweetsPage(webapp.RequestHandler):
 			self.response.out.write(template.render(path, template_values))
 		else:
 
-			count = 10
+			count = 5
 			page = 1
 			try:
 				page = int(self.request.get("page", 1))
@@ -115,7 +115,7 @@ class TweetsPage(webapp.RequestHandler):
 						"text": tweet.text,
 						"key": str(tweet.key()),
 						"date": {
-							"readable": tweet.date.strftime("at %I:%M %p on %b %d, %Y"),
+							"readable": tweet.date.strftime("at %I:%M %p (UTC) on %b %d, %Y"),
 							"system": tweet.date.strftime("%Y-%m-%d %H:%M"),
 						}
 					}
@@ -125,8 +125,13 @@ class TweetsPage(webapp.RequestHandler):
 			template_values = {
 					"profile": profile,
 					"tweets": tweets,
-					"page": page,
 			}
+
+			if page > 1:
+				template_values["prevpage"] = "/%s/tweets?page=%i" % (profile.screenname, page - 1)
+	
+			if len(tweets) == count:
+				template_values["nextpage"] = "/%s/tweets?page=%i" % (profile.screenname, page + 1)
 	
 			path = os.path.join(os.path.dirname(__file__), 'tweets.html')
 			self.response.out.write(template.render(path, template_values))
@@ -147,7 +152,7 @@ class RecentTweetsPage(webapp.RequestHandler):
 	def get(self, profileName):
 		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
 
-		count = 10
+		count = 5
 		page = 1
 		try:
 			page = int(self.request.get("page", 1))
@@ -163,7 +168,7 @@ class RecentTweetsPage(webapp.RequestHandler):
 					"text": tweet.text,
 					"key": str(tweet.key()),
 					"date": {
-						"readable": tweet.postedDate.strftime("at %I:%M %p on %b %d, %Y"),
+						"readable": tweet.postedDate.strftime("at %I:%M %p (UTC) on %b %d, %Y"),
 						"system": tweet.postedDate.strftime("%Y-%m-%d %H:%M"),
 					}
 				}
@@ -173,8 +178,13 @@ class RecentTweetsPage(webapp.RequestHandler):
 		template_values = {
 				"profile": profile,
 				"tweets": tweets,
-				"page": page,
 		}
+
+		if page > 1:
+			template_values["prevpage"] = "/%s/tweets?page=%i" % (profile.screenname, page - 1)
+
+		if len(tweets) == count:
+			template_values["nextpage"] = "/%s/tweets?page=%i" % (profile.screenname, page + 1)
 
 		path = os.path.join(os.path.dirname(__file__), 'recenttweets.html')
 		self.response.out.write(template.render(path, template_values))

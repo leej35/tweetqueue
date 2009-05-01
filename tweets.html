@@ -33,5 +33,14 @@
 			</li>
 			{% endfor %}
 		</ul>
+		<div>
+			{% if prevpage %}
+			<a href="{{ prevpage }}">&lt; Previous</a>
+			{% endif %}
+
+			{% if nextpage %}
+			<a href="{{ nextpage }}">Next &gt;</a>
+			{% endif %}
+		</div>
 	</body>
 </html>
