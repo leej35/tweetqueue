@@ -1,0 +1,41 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Tweet Queue</title>
+		<link rel="stylesheet" href="/static/default.css" type="text/css" />
+		<!--[if !IE]>-->
+		<link media="only screen and (max-device-width: 480px)" rel="stylesheet" type="text/css" href="/static/iphone.css"/>
+		<!--<![endif]-->
+		<meta name="viewport" content="width=320" />
+		
+	</head>
+	<body>
+		<p style="height: 0px; margin: 0px;"><a name="top"></a></p>
+		<h1>{{ profile.name }}</h1>
+		<ul>
+			<li>
+				<div>
+					<form method="POST" action="/tweet/{{ tweet.key }}">
+						<table>
+							<tr>
+								<td>Profile</td>
+								<td>{{ profile.name }}</td>
+							</tr>
+							<tr>
+								<td><label for="text">Text</label></td>
+								<td><textarea name="text" id="text">{{ tweet.text }}</textarea></td>
+							</tr>
+							<tr>
+								<td><label for="date">Date (YYYY-MM-DD HH:MM)</label></td>
+								<td><input type="text" name="date" id="date" value="{{ tweet.date }}"></input></td>
+							</tr>
+							<tr>
+								<td>&nbsp;</td>
+								<td><input type="submit" name="Update" value="Update"></input> <input type="submit" name="Delete" value="Delete"></input></td>
+							</tr>
+						</table>
+					</form>
+				</div>
+			</li>
+		</ul>
+	</body>
+</html>
