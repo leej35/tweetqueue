@@ -12,38 +12,25 @@
 		<p style="height: 0px; margin: 0px;"><a name="top"></a></p>
 		<h1>{{ profile.name }}</h1>
 		<ul>
-			{% for tweet in tweets %}
-			<li>
-				<span>
-					<a href="/tweet/{{ tweet.key }}">/tweet/{{ tweet.key }}</a>
-				</span>
-				<span>
-					{{ tweet.text }}
-				</span>
-				<span>
-					{{ tweet.date }}
-				</span>
-			</li>
-			{% endfor %}
 			<li>
 				<div>
-					<form method="POST" action="/{{ profile.name }}/tweets">
+					<form method="POST" action="/tweet/{{ tweet.key }}">
 						<table>
 							<tr>
 								<td>Profile</td>
-								<td>{{ profile.name }}<input type="hidden" name="profile" id="profile"></input></td>
+								<td>{{ profile.name }}</td>
 							</tr>
 							<tr>
 								<td><label for="text">Text</label></td>
-								<td><textarea name="text" id="text"></textarea></td>
+								<td><textarea name="text" id="text">{{ tweet.text }}</textarea></td>
 							</tr>
 							<tr>
 								<td><label for="date">Date (YYYY-MM-DD HH:MM)</label></td>
-								<td><input type="text" name="date" id="date"></input></td>
+								<td><input type="text" name="date" id="date" value="{{ tweet.date }}"></input></td>
 							</tr>
 							<tr>
 								<td>&nbsp;</td>
-								<td><input type="submit" name="Add" value="Add"></input></td>
+								<td><input type="submit" name="Update" value="Update"></input> <input type="submit" name="Delete" value="Delete"></input></td>
 							</tr>
 						</table>
 					</form>

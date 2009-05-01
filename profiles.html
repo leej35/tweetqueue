@@ -11,9 +11,18 @@
 	<body>
 		<p style="height: 0px; margin: 0px;"><a name="top"></a></p>
 		<h1>Profiles</h1>
-		<ul>
+		<ul class="profiles">
 			{% for profile in profiles %}
-			<li><a href="/tweets/{{ profile.name }}">{{ profile.name }}</a></li>
+			<li>
+				<div class="profile">
+					<img src="{{ profile.imageref }}" class="profilepicture"/>
+					<div>
+						<h1 class="fullname">{{ profile.fullname }}</h1>
+						<div class="screenname">{{ profile.name }}</div>
+						<div class="links"><a href="/{{ profile.name }}/tweets?mode=add">Schedule a tweet</a> | <a href="/{{ profile.name }}/tweets">Upcoming tweets</a> | <a href="/{{ profile.name }}/tweets/recent">Recent tweets</a> | <a href="/{{ profile.name }}">View profile information</a> | <a href="/{{ profile.name }}?mode=edit">Edit profile</a></div>
+					</div>
+				</div>
+			</li>
 			{% endfor %}
 			<li>
 				<div>

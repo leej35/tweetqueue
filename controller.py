@@ -15,6 +15,9 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 class Profile(db.Model):
 	name       = db.StringProperty()
 	password   = db.StringProperty()
+	fullname   = db.StringProperty()
+	imageref   = db.StringProperty()
+	lastupdate = db.DateTimeProperty()
 
 class Tweet(db.Model):
 	profile    = db.ReferenceProperty(Profile)
@@ -38,6 +41,9 @@ class ProfilesPage(webapp.RequestHandler):
 		profile = Profile()
 		profile.name = self.request.get("name")
 		profile.password = self.request.get("password")
+		profile.fullname = self.request.get("name")
+		profile.imageref = "http://static.twitter.com/images/default_profile_normal.png"
+		profile.lastupdate = datetime.datetime.min
 		profile.put()
 
 		self.redirect('/profiles')
@@ -67,7 +73,7 @@ class TweetsPage(webapp.RequestHandler):
 		tweet.posted = False
 		tweet.put()
 
-		self.redirect('/tweets/' + profile.name)
+		self.redirect('/%s/tweets' % profile.name)
 
 class TweetPage(webapp.RequestHandler):
 	def get(self, key):
@@ -141,7 +147,7 @@ application = webapp.WSGIApplication(
 	[
 		('/', ProfilesPage),
 		('/profiles', ProfilesPage),
-		('/tweets/([^/]*)', TweetsPage),
+		('/([^/]*)/tweets', TweetsPage),
 		('/tweet/([^/]*)', TweetPage),
 		('/util/update', UpdatePage),
 	],
