@@ -1,4 +1,4 @@
 cron:
 - description: Send queued status updates
   url: /util/update
-  schedule: every 60 minutes
+  schedule: every 5 minutes

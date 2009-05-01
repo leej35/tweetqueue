@@ -1,0 +1,45 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Tweet Queue</title>
+		<link rel="stylesheet" href="/static/default.css" type="text/css" />
+		<!--[if !IE]>-->
+		<link media="only screen and (max-device-width: 480px)" rel="stylesheet" type="text/css" href="/static/iphone.css"/>
+		<!--<![endif]-->
+		<meta name="viewport" content="width=320" />
+		
+	</head>
+	<body>
+		<div class="profile">
+			<img src="{{ profile.imageref }}" class="profilepicture"/>
+			<div>
+				<h1 class="fullname">{{ profile.fullname }}</h1>
+				<div class="screenname">{{ profile.screenname }}</div>
+				<div class="links"><a href="/{{ profile.screenname }}/tweets?mode=add">Schedule a tweet</a> | <a href="/{{ profile.screenname }}/tweets">Upcoming tweets</a> | <a href="/{{ profile.screenname }}/tweets/recent">Recent tweets</a> | <a href="/{{ profile.screenname }}">View profile information</a> | <strong>Edit profile</strong></div>
+			</div>
+		</div>
+		<form method="POST" action="/{{ profile.screenname }}">
+			<table>
+				<tr>
+					<td><label for="fullname">Full name</label></td>
+					<td><input type="text" name="fullname" id="fullname" value="{{ profile.fullname }}"></input></td>
+				</tr>
+				<tr>
+					<td><label for="screenname">Screen name</label></td>
+					<td><input type="text" name="screenname" id="screenname" value="{{ profile.screenname }}"></input></td>
+				</tr>
+				<tr>
+					<td><label for="password">Password</label></td>
+					<td><input type="text" name="password" id="password" value="{{ profile.password }}"></input></td>
+				</tr>
+				<tr>
+					<td><label for="imageref">Image location</label></td>
+					<td><input type="text" name="imageref" id="imageref" value="{{ profile.imageref }}"></input></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><input type="submit" name="Update" value="Update"></input> <input type="submit" name="Delete" value="Delete"></input></td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>

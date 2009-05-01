@@ -1,0 +1,21 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Tweet Queue</title>
+		<link rel="stylesheet" href="/static/default.css" type="text/css" />
+		<!--[if !IE]>-->
+		<link media="only screen and (max-device-width: 480px)" rel="stylesheet" type="text/css" href="/static/iphone.css"/>
+		<!--<![endif]-->
+		<meta name="viewport" content="width=320" />
+		
+	</head>
+	<body>
+		<div class="profile">
+			<img src="{{ profile.imageref }}" class="profilepicture"/>
+			<div>
+				<h1 class="fullname">{{ profile.fullname }}</h1>
+				<div class="screenname">{{ profile.screenname }}</div>
+				<div class="links"><a href="/{{ profile.screenname }}/tweets?mode=add">Schedule a tweet</a> | <a href="/{{ profile.screenname }}/tweets">Upcoming tweets</a> | <a href="/{{ profile.screenname }}/tweets/recent">Recent tweets</a> | <strong>View profile information</strong> | <a href="/{{ profile.screenname }}?mode=edit">Edit profile</a></div>
+			</div>
+		</div>
+	</body>
+</html>

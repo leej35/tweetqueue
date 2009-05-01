@@ -10,32 +10,35 @@
 	</head>
 	<body>
 		<p style="height: 0px; margin: 0px;"><a name="top"></a></p>
-		<h1>{{ profile.name }}</h1>
-		<ul>
-			<li>
-				<div>
-					<form method="POST" action="/tweet/{{ tweet.key }}">
-						<table>
-							<tr>
-								<td>Profile</td>
-								<td>{{ profile.name }}</td>
-							</tr>
-							<tr>
-								<td><label for="text">Text</label></td>
-								<td><textarea name="text" id="text">{{ tweet.text }}</textarea></td>
-							</tr>
-							<tr>
-								<td><label for="date">Date (YYYY-MM-DD HH:MM)</label></td>
-								<td><input type="text" name="date" id="date" value="{{ tweet.date }}"></input></td>
-							</tr>
-							<tr>
-								<td>&nbsp;</td>
-								<td><input type="submit" name="Update" value="Update"></input> <input type="submit" name="Delete" value="Delete"></input></td>
-							</tr>
-						</table>
-					</form>
-				</div>
-			</li>
-		</ul>
+		<div class="profile">
+			<img src="{{ profile.imageref }}" class="profilepicture"/>
+			<div>
+				<h1 class="fullname">{{ profile.fullname }}</h1>
+				<div class="screenname">{{ profile.screenname }}</div>
+				<div class="links"><strong>Schedule a tweet</strong> | <a href="/{{ profile.screenname }}/tweets">Upcoming tweets</a> | <a href="/{{ profile.screenname }}/tweets/recent">Recent tweets</a> | <a href="/{{ profile.screenname }}">View profile information</a> | <a href="/{{ profile.screenname }}?mode=edit">Edit profile</a></div>
+			</div>
+		</div>
+		<div>
+			<form method="POST" action="/{{ profile.screenname }}/tweets">
+				<table>
+					<tr>
+						<td>Profile</td>
+						<td>{{ profile.screenname }}</td>
+					</tr>
+					<tr>
+						<td><label for="date">Date (YYYY-MM-DD HH:MM)</label></td>
+						<td><input type="text" name="date" id="date"></input></td>
+					</tr>
+					<tr>
+						<td><label for="text">Text</label></td>
+						<td><textarea name="text" id="text" cols="60" rows="5"></textarea></td>
+					</tr>
+					<tr>
+						<td>&nbsp;</td>
+						<td><input type="submit" name="Add" value="Add"></input></td>
+					</tr>
+				</table>
+			</form>
+		</div>
 	</body>
 </html>

@@ -13,7 +13,7 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 class Profile(db.Model):
-	name       = db.StringProperty()
+	screenname = db.StringProperty()
 	password   = db.StringProperty()
 	fullname   = db.StringProperty()
 	imageref   = db.StringProperty()
@@ -39,32 +39,100 @@ class ProfilesPage(webapp.RequestHandler):
 
 	def post(self):
 		profile = Profile()
-		profile.name = self.request.get("name")
+		profile.screenname = self.request.get("screenname")
 		profile.password = self.request.get("password")
-		profile.fullname = self.request.get("name")
+		profile.fullname = self.request.get("screenname")
 		profile.imageref = "http://static.twitter.com/images/default_profile_normal.png"
 		profile.lastupdate = datetime.datetime.min
 		profile.put()
 
 		self.redirect('/profiles')
 
-class TweetsPage(webapp.RequestHandler):
+class ProfilePage(webapp.RequestHandler):
 	def get(self, profileName):
-		profile = db.GqlQuery("SELECT * FROM Profile WHERE name = :1", profileName).get()
+		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
 
-		tweets = db.GqlQuery("SELECT * FROM Tweet WHERE profile = :1 AND posted = :2 ORDER BY date", profile, False)
+		if self.request.get("mode", "") == "edit":
 
-		template_values = {
-				"profile": profile,
-				"tweets": tweets,
-		}
+			template_values = {
+					"profile": profile,
+			}
 
-		path = os.path.join(os.path.dirname(__file__), 'tweets.html')
-		self.response.out.write(template.render(path, template_values))
+			path = os.path.join(os.path.dirname(__file__), 'profile-edit.html')
+			self.response.out.write(template.render(path, template_values))
+
+		else:
+
+			template_values = {
+					"profile": profile,
+			}
+	
+			path = os.path.join(os.path.dirname(__file__), 'profile.html')
+			self.response.out.write(template.render(path, template_values))
 
 	def post(self, profileName):
-		profile = db.GqlQuery("SELECT * FROM Profile WHERE name = :1", profileName).get()
+		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
 
+		if not self.request.get("Delete", default_value=None) == None:
+			profile.delete()
+			self.redirect('/profiles')
+		else:
+			profile.screenname = self.request.get("screenname")
+			profile.password = self.request.get("password")
+			profile.fullname = self.request.get("fullname")
+			profile.imageref = self.request.get("imageref")
+			profile.put()
+
+			self.redirect('/' + profile.screenname)
+
+class TweetsPage(webapp.RequestHandler):
+	def get(self, profileName):
+		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
+
+		if self.request.get("mode", "") == "add":
+
+			template_values = {
+					"profile": profile,
+			}
+
+			path = os.path.join(os.path.dirname(__file__), 'tweet-add.html')
+			self.response.out.write(template.render(path, template_values))
+		else:
+
+			count = 10
+			page = 1
+			try:
+				page = int(self.request.get("page", 1))
+				if page < 1:
+					page = 1
+			except:
+				page = 1
+			offset = (page - 1) * count
+	
+			tweetsQuery = Tweet.all().filter("profile =", profile).filter("posted = ", False).order("date").fetch(count, offset=offset)
+			tweets = [
+					{
+						"text": tweet.text,
+						"key": str(tweet.key()),
+						"date": {
+							"readable": tweet.date.strftime("at %I:%M %p on %b %d, %Y"),
+							"system": tweet.date.strftime("%Y-%m-%d %H:%M"),
+						}
+					}
+					for tweet in tweetsQuery
+			]
+
+			template_values = {
+					"profile": profile,
+					"tweets": tweets,
+					"page": page,
+			}
+	
+			path = os.path.join(os.path.dirname(__file__), 'tweets.html')
+			self.response.out.write(template.render(path, template_values))
+
+	def post(self, profileName):
+		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
 
 		tweet = Tweet(posted=False)
 		tweet.profile = profile
@@ -73,7 +141,43 @@ class TweetsPage(webapp.RequestHandler):
 		tweet.posted = False
 		tweet.put()
 
-		self.redirect('/%s/tweets' % profile.name)
+		self.redirect('/%s/tweets' % profile.screenname)
+
+class RecentTweetsPage(webapp.RequestHandler):
+	def get(self, profileName):
+		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
+
+		count = 10
+		page = 1
+		try:
+			page = int(self.request.get("page", 1))
+			if page < 1:
+				page = 1
+		except:
+			page = 1
+		offset = (page - 1) * count
+
+		tweetsQuery = Tweet.all().filter("profile =", profile).filter("posted = ", True).order("-date").fetch(count, offset=offset)
+		tweets = [
+				{
+					"text": tweet.text,
+					"key": str(tweet.key()),
+					"date": {
+						"readable": tweet.postedDate.strftime("at %I:%M %p on %b %d, %Y"),
+						"system": tweet.postedDate.strftime("%Y-%m-%d %H:%M"),
+					}
+				}
+				for tweet in tweetsQuery
+		]
+
+		template_values = {
+				"profile": profile,
+				"tweets": tweets,
+				"page": page,
+		}
+
+		path = os.path.join(os.path.dirname(__file__), 'recenttweets.html')
+		self.response.out.write(template.render(path, template_values))
 
 class TweetPage(webapp.RequestHandler):
 	def get(self, key):
@@ -96,12 +200,12 @@ class TweetPage(webapp.RequestHandler):
 
 		if not self.request.get("Delete", default_value=None) == None:
 			tweet.delete()
-			self.redirect('/tweets/' + tweet.profile.name)
+			self.redirect('/%s/tweets' % tweet.profile.screenname)
 		else:
 			tweet.text = self.request.get("text")
 			tweet.date = datetime.datetime.strptime(self.request.get("date"), "%Y-%m-%d %H:%M")
 			tweet.put()
-			self.redirect('/tweets/' + tweet.profile.name)
+			self.redirect('/%s/tweets' + tweet.profile.screenname)
 
 class UpdatePage(webapp.RequestHandler):
 	def get(self):
@@ -115,11 +219,11 @@ class UpdatePage(webapp.RequestHandler):
 
 		for tweet in tweets:
 			self.response.out.write("Text: " + str(tweet.text) + "\n")
-			self.response.out.write("Login: " + str(tweet.profile.name) + "\n")
+			self.response.out.write("Login: " + str(tweet.profile.screenname) + "\n")
 			self.response.out.write("Password: " + str(tweet.profile.password) + "\n")
 			self.response.out.write("Updated: " + str(tweet.postedDate) + "\n")
 			try:
-				encodedAuthentication = base64.encodestring(tweet.profile.name + ":" + tweet.profile.password).strip()
+				encodedAuthentication = base64.encodestring(tweet.profile.screenname + ":" + tweet.profile.password).strip()
 				form_fields = {
 	  				"status": tweet.text,
 				}
@@ -142,12 +246,13 @@ class UpdatePage(webapp.RequestHandler):
 				self.response.out.write("FAILED! " + str(e) + "\n")
 			self.response.out.write("\n")
 
-
 application = webapp.WSGIApplication(
 	[
 		('/', ProfilesPage),
 		('/profiles', ProfilesPage),
+		('/([^/]*)', ProfilePage),
 		('/([^/]*)/tweets', TweetsPage),
+		('/([^/]*)/tweets/recent', RecentTweetsPage),
 		('/tweet/([^/]*)', TweetPage),
 		('/util/update', UpdatePage),
 	],

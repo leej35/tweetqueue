@@ -18,8 +18,8 @@
 					<img src="{{ profile.imageref }}" class="profilepicture"/>
 					<div>
 						<h1 class="fullname">{{ profile.fullname }}</h1>
-						<div class="screenname">{{ profile.name }}</div>
-						<div class="links"><a href="/{{ profile.name }}/tweets?mode=add">Schedule a tweet</a> | <a href="/{{ profile.name }}/tweets">Upcoming tweets</a> | <a href="/{{ profile.name }}/tweets/recent">Recent tweets</a> | <a href="/{{ profile.name }}">View profile information</a> | <a href="/{{ profile.name }}?mode=edit">Edit profile</a></div>
+						<div class="screenname">{{ profile.screenname }}</div>
+						<div class="links"><a href="/{{ profile.screenname }}/tweets?mode=add">Schedule a tweet</a> | <a href="/{{ profile.screenname }}/tweets">Upcoming tweets</a> | <a href="/{{ profile.screenname }}/tweets/recent">Recent tweets</a> | <a href="/{{ profile.screenname }}">View profile information</a> | <a href="/{{ profile.screenname }}?mode=edit">Edit profile</a></div>
 					</div>
 				</div>
 			</li>
@@ -29,8 +29,8 @@
 					<form method="POST" action="/profiles">
 						<table>
 							<tr>
-								<td><label for="name">Name</label></td>
-								<td><input type="text" name="name" id="name"></input></td>
+								<td><label for="screenname">Name</label></td>
+								<td><input type="text" name="screenname" id="screenname"></input></td>
 							</tr>
 							<tr>
 								<td><label for="password">Password</label></td>

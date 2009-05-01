@@ -15,7 +15,7 @@
 			<div>
 				<h1 class="fullname">{{ profile.fullname }}</h1>
 				<div class="screenname">{{ profile.screenname }}</div>
-				<div class="links"><a href="/{{ profile.screenname }}/tweets?mode=add">Schedule a tweet</a> | <strong>Upcoming tweets</strong> | <a href="/{{ profile.screenname }}/tweets/recent">Recent tweets</a> | <a href="/{{ profile.screenname }}">View profile information</a> | <a href="/{{ profile.screenname }}?mode=edit">Edit profile</a></div>
+				<div class="links"><a href="/{{ profile.screenname }}/tweets?mode=add">Schedule a tweet</a> | <a href="/{{ profile.screenname }}/tweets">Upcoming tweets</a> | <strong>Recent tweets</strong> | <a href="/{{ profile.screenname }}">View profile information</a> | <a href="/{{ profile.screenname }}?mode=edit">Edit profile</a></div>
 			</div>
 		</div>
 		<ul class="tweets">
@@ -28,7 +28,7 @@
 					{{ tweet.text }}
 				</blockquote>
 				<div class="links">
-					<a href="/tweet/{{ tweet.key }}">View</a> | <a href="/tweet/{{ tweet.key }}?mode=edit">Edit</a>
+					<a href="/tweet/{{ tweet.key }}">View</a>
 				</div>
 			</li>
 			{% endfor %}
