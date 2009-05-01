@@ -17,6 +17,8 @@ class Tweet(db.Model):
 	profile    = db.ReferenceProperty(Profile)
 	text       = db.StringProperty()
 	date       = db.DateTimeProperty()
+	posted     = db.BooleanProperty(required=True)
+	postedDate = db.DateTimeProperty()
 
 class ProfilesPage(webapp.RequestHandler):
 	def get(self):
@@ -55,13 +57,45 @@ class TweetsPage(webapp.RequestHandler):
 		profile = db.GqlQuery("SELECT * FROM Profile WHERE name = :1", profileName).get()
 
 
-		tweet = Tweet()
+		tweet = Tweet(posted=False)
 		tweet.profile = profile
 		tweet.text = self.request.get("text")
 		tweet.date = datetime.datetime.strptime(self.request.get("date"), "%Y-%m-%d %H:%M")
+		tweet.posted = False
 		tweet.put()
 
 		self.redirect('/tweets/' + profile.name)
+
+class UpdatePage(webapp.RequestHandler):
+	def get(self):
+
+		tweets = db.GqlQuery("SELECT * FROM Tweet WHERE date < :1 ORDER BY date", datetime.datetime.utcnow())
+
+		self.response.headers["Content-Type"] = "text/plain"
+
+		for tweet in tweets:
+			self.response.out.write("Date: " + str(tweet.date) + "\n")
+			self.response.out.write("Text: " + str(tweet.text) + "\n")
+			self.response.out.write("Login: " + str(tweet.profile.name) + "\n")
+			self.response.out.write("Password: " + str(tweet.profile.password) + "\n")
+			self.response.out.write("Updated: " + str(tweet.postedDate) + "\n")
+			self.response.out.write("\n")
+
+	def post(self):
+
+		tweets = db.GqlQuery("SELECT * FROM Tweet")
+
+		self.response.headers["Content-Type"] = "text/plain"
+
+		for tweet in tweets:
+			tweet.posted = False
+			tweet.put()
+			self.response.out.write("Date: " + str(tweet.date) + "\n")
+			self.response.out.write("Text: " + str(tweet.text) + "\n")
+			self.response.out.write("Login: " + str(tweet.profile.name) + "\n")
+			self.response.out.write("Password: " + str(tweet.profile.password) + "\n")
+			self.response.out.write("Updated: " + str(tweet.updated) + "\n")
+			self.response.out.write("\n")
 
 #class Guests(webapp.RequestHandler):
 #	@loginRequired
@@ -328,6 +362,7 @@ application = webapp.WSGIApplication(
 		('/', ProfilesPage),
 		('/profiles', ProfilesPage),
 		('/tweets/([^/]*)', TweetsPage),
+		('/util/update', UpdatePage),
 #		('/wedding/guests(?:\.xml)?', Guests),
 #		('/wedding/guest/([^/]*)', GuestR),
 #		('/wedding/guests/add', AddGuest),
