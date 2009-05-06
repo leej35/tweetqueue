@@ -8,4 +8,4 @@ handlers:
   static_dir: static
 - url: /.*
   script: /controller.py
-  login: admin
+#  login: admin

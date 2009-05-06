@@ -23,7 +23,7 @@ indexes:
   - name: posted
   - name: date
 
-# Used 75 times in query history.
+# Used 98 times in query history.
 - kind: Tweet
   properties:
   - name: posted

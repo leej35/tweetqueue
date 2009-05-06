@@ -12,12 +12,19 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp.util import run_wsgi_app
 
+from django.utils import simplejson
+
+import auth
+import auth_controller
+import auth_models
+
 class Profile(db.Model):
 	screenname = db.StringProperty()
 	password   = db.StringProperty()
 	fullname   = db.StringProperty()
 	imageref   = db.StringProperty()
 	lastupdate = db.DateTimeProperty()
+	owner      = db.ReferenceProperty(auth_models.User)
 
 class Tweet(db.Model):
 	profile    = db.ReferenceProperty(Profile)
@@ -27,6 +34,8 @@ class Tweet(db.Model):
 	postedDate = db.DateTimeProperty()
 
 class ProfilesPage(webapp.RequestHandler):
+
+	@auth.authorizationRequired
 	def get(self):
 		profiles = db.GqlQuery("SELECT * FROM Profile")
 
@@ -37,6 +46,7 @@ class ProfilesPage(webapp.RequestHandler):
 		path = os.path.join(os.path.dirname(__file__), 'profiles.html')
 		self.response.out.write(template.render(path, template_values))
 
+	@auth.authorizationRequired
 	def post(self):
 		profile = Profile()
 		profile.screenname = self.request.get("screenname")
@@ -49,8 +59,20 @@ class ProfilesPage(webapp.RequestHandler):
 		self.redirect('/profiles')
 
 class ProfilePage(webapp.RequestHandler):
+
+	@auth.authorizationRequired
 	def get(self, profileName):
 		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
+
+		# We need this to associate profiles from older version that don't have owners
+		#   with their new owners. Bad idea? Yes. Works? Yes.
+		if profile.owner == None:
+			profile.owner = self.request.authorized_user
+			profile.put()
+
+		if str(profile.owner.key()) != str(self.request.authorized_user.key()):
+			auth.report_unauthorized(self.response, message="You are not the owner of this profile.")
+			return
 
 		if self.request.get("mode", "") == "edit":
 
@@ -70,6 +92,7 @@ class ProfilePage(webapp.RequestHandler):
 			path = os.path.join(os.path.dirname(__file__), 'profile.html')
 			self.response.out.write(template.render(path, template_values))
 
+	@auth.authorizationRequired
 	def post(self, profileName):
 		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
 
@@ -86,6 +109,8 @@ class ProfilePage(webapp.RequestHandler):
 			self.redirect('/' + profile.screenname)
 
 class TweetsPage(webapp.RequestHandler):
+
+	@auth.authorizationRequired
 	def get(self, profileName):
 		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
 
@@ -136,19 +161,51 @@ class TweetsPage(webapp.RequestHandler):
 			path = os.path.join(os.path.dirname(__file__), 'tweets.html')
 			self.response.out.write(template.render(path, template_values))
 
+	@auth.authorizationRequired
 	def post(self, profileName):
 		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
 
-		tweet = Tweet(posted=False)
-		tweet.profile = profile
-		tweet.text = self.request.get("text")
-		tweet.date = datetime.datetime.strptime(self.request.get("date"), "%Y-%m-%d %H:%M")
-		tweet.posted = False
-		tweet.put()
+		if self.request.headers['Content-Type'] == 'application/json':
+			input = {}
+			try:
+				input = simplejson.loads(self.request.body)
+			except:
+				self.response.set_status(400)
+				self.response.headers['Content-Type'] = "text/plain"
+				self.response.out.write("Cannot parse JSON")
+				return
+
+			def makeTweet(dict):
+				tweet = Tweet(posted=False)
+				tweet.profile = profile
+				tweet.text = dict["text"]
+				datestring = dict["date"]
+				try:
+					tweet.date = datetime.datetime.strptime(datestring, "%Y-%m-%d %H:%M")
+				except:
+					raise KeyError("date")
+				tweet.posted = False
+				tweet.put()
+
+			if input.has_key("tweets"):
+				for tweet in input["tweets"]:
+					makeTweet(tweet)
+
+			else:
+				makeTweet(input)
+		else:
+			tweet = Tweet(posted=False)
+			tweet.profile = profile
+			tweet.text = self.request.get("text")
+			tweet.date = datetime.datetime.strptime(self.request.get("date"), "%Y-%m-%d %H:%M")
+			tweet.posted = False
+			tweet.put()
 
 		self.redirect('/%s/tweets' % profile.screenname)
 
 class RecentTweetsPage(webapp.RequestHandler):
+
+	@auth.authorizationRequired
 	def get(self, profileName):
 		profile = db.GqlQuery("SELECT * FROM Profile WHERE screenname = :1", profileName).get()
 
@@ -190,6 +247,8 @@ class RecentTweetsPage(webapp.RequestHandler):
 		self.response.out.write(template.render(path, template_values))
 
 class TweetPage(webapp.RequestHandler):
+
+	@auth.authorizationRequired
 	def get(self, key):
 		tweet = db.get(db.Key(key))
 
@@ -205,6 +264,7 @@ class TweetPage(webapp.RequestHandler):
 		path = os.path.join(os.path.dirname(__file__), 'tweet.html')
 		self.response.out.write(template.render(path, template_values))
 
+	@auth.authorizationRequired
 	def post(self, key):
 		tweet = db.get(db.Key(key))
 
@@ -258,6 +318,12 @@ class UpdatePage(webapp.RequestHandler):
 
 application = webapp.WSGIApplication(
 	[
+		# User admin
+		('/users', auth_controller.Users),
+		('/user/([^/]*)', auth_controller.User),
+		('/token-requests', auth_controller.TokenRequest),
+
+		# The rest
 		('/', ProfilesPage),
 		('/profiles', ProfilesPage),
 		('/([^/]*)', ProfilePage),
